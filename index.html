@@ -7,677 +7,293 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f0f11;--surface:#18181c;--surface2:#22222a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --accent:#c8f069;--accent-dim:rgba(200,240,105,0.1);--accent-dim2:rgba(200,240,105,0.2);
+  --text:#f0f0f0;--text2:#9a9aab;--text3:#5a5a70;--red:#ff6b6b;
+  --mono:'DM Mono',monospace;--serif:'Fraunces',Georgia,serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem 5rem;}
+header{text-align:center;margin-bottom:3rem;}
+.eyebrow{font-size:11px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:0.75rem;}
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(1.9rem,5vw,3rem);line-height:1.15;}
+h1 em{font-style:italic;color:var(--accent);}
+.subtitle{margin-top:0.75rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:480px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:560px;}
+.field{margin-bottom:1.5rem;}
+label{display:block;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem;}
+input[type="text"],input[type="url"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;padding:0.7rem 1rem;outline:none;transition:border-color 0.2s;}
+input[type="text"]:focus,input[type="url"]:focus{border-color:var(--accent);}
+input::placeholder{color:var(--text3);}
+.icon-tabs{display:flex;gap:6px;margin-bottom:1rem;}
+.tab-btn{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;padding:0.45rem 0;cursor:pointer;transition:all 0.15s;}
+.tab-btn.active{background:var(--accent-dim2);border-color:var(--accent);color:var(--accent);}
+.tab-btn:hover:not(.active){border-color:var(--border2);color:var(--text);}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-height:200px;overflow-y:auto;padding-right:4px;}
+.emoji-grid::-webkit-scrollbar{width:4px;}.emoji-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.emoji-btn{aspect-ratio:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;line-height:1;}
+.emoji-btn:hover{border-color:var(--border2);transform:scale(1.08);}
+.emoji-btn.selected{border-color:var(--accent);background:var(--accent-dim2);}
+.upload-area{border:1px dashed var(--border2);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.upload-area:hover{border-color:var(--accent);background:var(--accent-dim);}
+.upload-area input{display:none;}
+.upload-icon{font-size:26px;margin-bottom:0.4rem;}
+.upload-label{font-size:12px;color:var(--text2);}
+.upload-hint{font-size:11px;color:var(--text3);margin-top:3px;}
+#img-preview{max-width:52px;max-height:52px;border-radius:8px;margin:0.5rem auto 0;display:none;}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;}
+.color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
+.color-swatch:hover{transform:scale(1.15);}
+.color-swatch.selected{border-color:white;}
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+.preview-block{display:flex;align-items:center;gap:1rem;background:var(--surface2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;}
+.icon-box{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;}
+.preview-text{min-width:0;}
+.preview-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.preview-url{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.error-msg{font-size:12px;color:var(--red);margin-top:0.4rem;display:none;}
+.add-btn{width:100%;background:var(--accent);color:#0f0f11;border:none;border-radius:10px;font-family:var(--mono);font-size:14px;font-weight:500;padding:0.85rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;letter-spacing:0.04em;}
+.add-btn:hover{opacity:0.88;}
+.add-btn:active{transform:scale(0.98);}
 
-  :root {
-    --bg: #0f0f11;
-    --surface: #18181c;
-    --surface2: #22222a;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --accent: #c8f069;
-    --accent-dim: rgba(200,240,105,0.12);
-    --accent-dim2: rgba(200,240,105,0.22);
-    --text: #f0f0f0;
-    --text2: #9a9aab;
-    --text3: #5a5a70;
-    --red: #ff6b6b;
-    --mono: 'DM Mono', monospace;
-    --serif: 'Fraunces', Georgia, serif;
-  }
+/* list */
+.list-section{width:100%;max-width:560px;margin-top:2rem;}
+.list-title{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text2);margin-bottom:0.75rem;}
+.list-empty{font-size:13px;color:var(--text3);text-align:center;padding:2rem 0;}
+.shortcut-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:0.75rem;}
+.sc-top{display:flex;align-items:center;gap:1rem;}
+.sc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:24px;}
+.sc-info{flex:1;min-width:0;}
+.sc-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-url{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.del-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:12px;padding:0.3rem 0.6rem;cursor:pointer;transition:all 0.15s;flex-shrink:0;}
+.del-btn:hover{border-color:var(--red);color:var(--red);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 1.5rem 4rem;
-  }
+/* instruction box */
+.sc-steps{margin-top:1rem;background:var(--surface2);border-radius:10px;padding:1rem 1.25rem;}
+.sc-steps-title{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:0.75rem;}
+.sc-step{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:0.4rem;display:flex;gap:8px;}
+.sc-step:last-child{margin-bottom:0;}
+.sc-step-num{color:var(--accent);flex-shrink:0;}
 
-  header {
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
-  }
-
-  h1 {
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    line-height: 1.15;
-    color: var(--text);
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .subtitle {
-    margin-top: 0.75rem;
-    font-size: 13px;
-    color: var(--text2);
-    line-height: 1.6;
-    max-width: 460px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 560px;
-  }
-
-  .field {
-    margin-bottom: 1.5rem;
-  }
-
-  label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 0.5rem;
-  }
-
-  input[type="text"], input[type="url"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    padding: 0.7rem 1rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input[type="text"]:focus, input[type="url"]:focus {
-    border-color: var(--accent);
-  }
-
-  input::placeholder { color: var(--text3); }
-
-  .icon-section label {
-    margin-bottom: 0.75rem;
-  }
-
-  .icon-tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 1rem;
-  }
-
-  .tab-btn {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text2);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 0.45rem 0;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .tab-btn.active {
-    background: var(--accent-dim2);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .tab-btn:hover:not(.active) {
-    border-color: var(--border2);
-    color: var(--text);
-  }
-
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  .emoji-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 6px;
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-
-  .emoji-grid::-webkit-scrollbar { width: 4px; }
-  .emoji-grid::-webkit-scrollbar-track { background: transparent; }
-  .emoji-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-
-  .emoji-btn {
-    aspect-ratio: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    line-height: 1;
-  }
-
-  .emoji-btn:hover { background: var(--surface); border-color: var(--border2); transform: scale(1.08); }
-  .emoji-btn.selected { border-color: var(--accent); background: var(--accent-dim2); }
-
-  .upload-area {
-    border: 1px dashed var(--border2);
-    border-radius: 10px;
-    padding: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .upload-area:hover { border-color: var(--accent); background: var(--accent-dim); }
-
-  .upload-area input { display: none; }
-  .upload-icon { font-size: 28px; margin-bottom: 0.5rem; }
-  .upload-label { font-size: 12px; color: var(--text2); }
-  .upload-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
-
-  #img-preview { max-width: 56px; max-height: 56px; border-radius: 8px; margin: 0.5rem auto 0; display: none; }
-
-  .color-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .color-swatch {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-
-  .color-swatch:hover { transform: scale(1.15); }
-  .color-swatch.selected { border-color: white; }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 1.5rem 0;
-  }
-
-  .preview-block {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--surface2);
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-
-  #icon-preview {
-    width: 56px; height: 56px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px;
-    flex-shrink: 0;
-    overflow: hidden;
-    background: #4285f4;
-  }
-
-  .preview-text { min-width: 0; }
-  .preview-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .preview-url { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-
-  .error-msg {
-    font-size: 12px;
-    color: var(--red);
-    margin-top: 0.4rem;
-    display: none;
-  }
-
-  .generate-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0f0f11;
-    border: none;
-    border-radius: 10px;
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
-    padding: 0.85rem;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    letter-spacing: 0.04em;
-  }
-
-  .generate-btn:hover { opacity: 0.88; }
-  .generate-btn:active { transform: scale(0.98); }
-
-  .steps-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.75rem 2rem;
-    width: 100%;
-    max-width: 560px;
-    margin-top: 1.25rem;
-  }
-
-  .steps-title {
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 1.2rem;
-  }
-
-  .step {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-
-  .step:last-child { margin-bottom: 0; }
-
-  .step-num {
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--accent-dim2);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-size: 11px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .step-text { font-size: 13px; line-height: 1.6; color: var(--text2); }
-  .step-text strong { color: var(--text); font-weight: 500; }
-
-  .kbd {
-    display: inline-block;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 11px;
-    color: var(--text);
-    vertical-align: middle;
-  }
+/* the big copy box */
+.copy-row{display:flex;gap:8px;margin-top:0.75rem;}
+.copy-input{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:0.6rem 0.75rem;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:text;}
+.copy-btn{background:var(--accent);color:#0f0f11;border:none;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:500;padding:0 1rem;cursor:pointer;white-space:nowrap;transition:opacity 0.15s;}
+.copy-btn:hover{opacity:0.85;}
+.copy-btn.copied{background:#34a853;color:#fff;}
+.open-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:0 1rem;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.open-btn:hover{border-color:var(--accent);color:var(--accent);}
 </style>
 </head>
 <body>
 
 <header>
   <p class="eyebrow">ChromeOS Utility</p>
-  <h1>Custom App<br><em>Shortcut Maker</em></h1>
-  <p class="subtitle">Build a launcher page with your icon. Add it to your shelf via Chrome's "Add to shelf" — then it opens your URL like a real app.</p>
+  <h1>App Shortcut <em>Maker</em></h1>
+  <p class="subtitle">Make custom app icons for your ChromeOS shelf. Each shortcut gets a link you paste into Chrome's address bar — then add to shelf.</p>
 </header>
 
 <div class="card">
-
   <div class="field">
     <label for="url-input">Destination URL</label>
-    <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off" />
-    <p class="error-msg" id="url-error">Please enter a valid URL starting with https://</p>
+    <input type="url" id="url-input" placeholder="https://example.com" autocomplete="off"/>
+    <p class="error-msg" id="url-error">Please enter a valid URL (https://...)</p>
   </div>
-
   <div class="field">
-    <label for="name-input">Shortcut name</label>
-    <input type="text" id="name-input" placeholder="My App" maxlength="40" />
+    <label for="name-input">App name</label>
+    <input type="text" id="name-input" placeholder="My App" maxlength="40"/>
   </div>
-
-  <div class="field icon-section">
+  <div class="field">
     <label>Icon</label>
     <div class="icon-tabs">
       <button class="tab-btn active" data-tab="emoji">Emoji</button>
       <button class="tab-btn" data-tab="upload">Image</button>
       <button class="tab-btn" data-tab="text">Monogram</button>
     </div>
-
     <div class="tab-panel active" id="tab-emoji">
       <div class="emoji-grid" id="emoji-grid"></div>
     </div>
-
     <div class="tab-panel" id="tab-upload">
       <div class="upload-area" id="upload-area">
-        <input type="file" id="file-input" accept="image/*" />
+        <input type="file" id="file-input" accept="image/*"/>
         <div class="upload-icon">⬆</div>
         <p class="upload-label">Click to upload an image</p>
         <p class="upload-hint">PNG, JPG, SVG, WebP</p>
-        <img id="img-preview" alt="preview" />
+        <img id="img-preview" alt="preview"/>
       </div>
     </div>
-
     <div class="tab-panel" id="tab-text">
-      <input type="text" id="monogram-input" placeholder="e.g. G or YT" maxlength="2" style="margin-bottom: 0.75rem;" />
+      <input type="text" id="monogram-input" placeholder="e.g. G or YT" maxlength="2" style="margin-bottom:0.75rem;"/>
       <div class="color-row" id="color-row"></div>
     </div>
   </div>
-
   <div class="divider"></div>
-
   <p style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:.75rem;">Preview</p>
   <div class="preview-block">
-    <div id="icon-preview">🌐</div>
+    <div class="icon-box" id="icon-preview" style="background:#1e1e2e;">🌐</div>
     <div class="preview-text">
       <p class="preview-name" id="preview-name">My App</p>
       <p class="preview-url" id="preview-url">https://example.com</p>
     </div>
   </div>
-
-  <button class="generate-btn" id="gen-btn">Generate & Open Shortcut Page →</button>
+  <button class="add-btn" id="add-btn">+ Add shortcut</button>
 </div>
 
-<div class="steps-card">
-  <p class="steps-title">How to pin it to your shelf</p>
-  <div class="step">
-    <div class="step-num">1</div>
-    <p class="step-text">Click <strong>"Generate & Open Shortcut Page"</strong> — a new tab will open with your custom icon page.</p>
-  </div>
-  <div class="step">
-    <div class="step-num">2</div>
-    <p class="step-text">In the new tab, click the <strong>three-dot menu</strong> <span class="kbd">⋮</span> in the top-right corner of Chrome.</p>
-  </div>
-  <div class="step">
-    <div class="step-num">3</div>
-    <p class="step-text">Go to <strong>More tools</strong> → <strong>Add to shelf</strong> (or "Create shortcut" on some versions). Check "Open as window" if you want an app feel.</p>
-  </div>
-  <div class="step">
-    <div class="step-num">4</div>
-    <p class="step-text">The shortcut appears in your shelf or launcher. Clicking it opens your destination URL with your custom icon!</p>
+<div class="list-section">
+  <p class="list-title">Your shortcuts (<span id="sc-count">0</span>)</p>
+  <div id="sc-list">
+    <p class="list-empty">No shortcuts yet — build one above.</p>
   </div>
 </div>
 
 <script>
-const EMOJIS = [
-  '🌐','🔗','📁','📂','💼','🏠','⭐','🔖','📧','📅','📝','🎵','🎬','📷','🎮','🛒',
-  '💬','🔍','⚙️','🔧','📊','📈','💡','🎨','✏️','📚','🏆','🔔','💻','📱','🖥️','🖨️',
-  '🗂️','📌','🔐','🛡️','🌙','☀️','🌈','❄️','🔥','⚡','💎','🚀','✈️','🏖️','🌿','🦁',
-  '🐉','🦊','🐼','🦋','🌸','🍕','☕','🎂','🎁','🎯','🧩','🎲','🃏','🎭','🎪','🏅'
-];
+const EMOJIS=['🌐','🔗','📁','📂','💼','🏠','⭐','🔖','📧','📅','📝','🎵','🎬','📷','🎮','🛒','💬','🔍','⚙️','🔧','📊','📈','💡','🎨','✏️','📚','🏆','🔔','💻','📱','🖥️','🖨️','🗂️','📌','🔐','🛡️','🌙','☀️','🌈','❄️','🔥','⚡','💎','🚀','✈️','🏖️','🌿','🦁','🐉','🦊','🐼','🦋','🌸','🍕','☕','🎂','🎁','🎯','🧩','🎲','🃏','🎭','🎪','🏅'];
+const COLORS=['#4285f4','#ea4335','#34a853','#fbbc05','#ff6d00','#9c27b0','#00bcd4','#607d8b','#e91e63','#795548','#222244','#0d7377'];
+let state={url:'',name:'My App',mode:'emoji',emoji:'🌐',imageDataUrl:null,monogram:'',color:'#4285f4'};
+let shortcuts=[];
 
-const COLORS = ['#4285f4','#ea4335','#34a853','#fbbc05','#ff6d00','#9c27b0','#00bcd4','#607d8b','#e91e63','#795548','#1a1a2e','#0d7377'];
+// emoji grid
+const egrid=document.getElementById('emoji-grid');
+EMOJIS.forEach(em=>{
+  const b=document.createElement('button');b.className='emoji-btn'+(em===state.emoji?' selected':'');b.textContent=em;
+  b.onclick=()=>{egrid.querySelectorAll('.emoji-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.emoji=em;updatePreview();};
+  egrid.appendChild(b);
+});
 
-let state = {
-  url: '',
-  name: 'My App',
-  mode: 'emoji',
-  emoji: '🌐',
-  imageDataUrl: null,
-  monogram: '',
-  color: '#4285f4'
-};
+// color row
+const crow=document.getElementById('color-row');
+COLORS.forEach(c=>{
+  const s=document.createElement('div');s.className='color-swatch'+(c===state.color?' selected':'');s.style.background=c;
+  s.onclick=()=>{crow.querySelectorAll('.color-swatch').forEach(x=>x.classList.remove('selected'));s.classList.add('selected');state.color=c;updatePreview();};
+  crow.appendChild(s);
+});
 
-const urlInput = document.getElementById('url-input');
-const nameInput = document.getElementById('name-input');
-const iconPreview = document.getElementById('icon-preview');
-const previewName = document.getElementById('preview-name');
-const previewUrl = document.getElementById('preview-url');
-const urlError = document.getElementById('url-error');
-
-function buildEmojiGrid() {
-  const grid = document.getElementById('emoji-grid');
-  EMOJIS.forEach(em => {
-    const btn = document.createElement('button');
-    btn.className = 'emoji-btn' + (em === state.emoji ? ' selected' : '');
-    btn.textContent = em;
-    btn.onclick = () => {
-      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      state.emoji = em;
-      updatePreview();
-    };
-    grid.appendChild(btn);
-  });
-}
-
-function buildColorRow() {
-  const row = document.getElementById('color-row');
-  COLORS.forEach(c => {
-    const sw = document.createElement('div');
-    sw.className = 'color-swatch' + (c === state.color ? ' selected' : '');
-    sw.style.background = c;
-    sw.onclick = () => {
-      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-      sw.classList.add('selected');
-      state.color = c;
-      updatePreview();
-    };
-    row.appendChild(sw);
-  });
-}
-
-function updatePreview() {
-  const ip = iconPreview;
-  ip.innerHTML = '';
-  ip.style.background = '';
-
-  if (state.mode === 'emoji') {
-    ip.textContent = state.emoji;
-    ip.style.background = '#1e1e2e';
-    ip.style.fontSize = '30px';
-  } else if (state.mode === 'upload' && state.imageDataUrl) {
-    const img = document.createElement('img');
-    img.src = state.imageDataUrl;
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;';
-    ip.appendChild(img);
-  } else if (state.mode === 'text') {
-    const mono = state.monogram || '?';
-    ip.textContent = mono.toUpperCase();
-    ip.style.background = state.color;
-    ip.style.color = '#fff';
-    ip.style.fontSize = mono.length > 1 ? '20px' : '26px';
-    ip.style.fontFamily = "'DM Mono', monospace";
-    ip.style.fontWeight = '500';
-  } else {
-    ip.textContent = '🌐';
-    ip.style.background = '#1e1e2e';
-    ip.style.fontSize = '30px';
-  }
-
-  previewName.textContent = state.name || 'My App';
-  previewUrl.textContent = state.url || 'https://example.com';
-}
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    state.mode = btn.dataset.tab;
-    document.getElementById('tab-' + state.mode).classList.add('active');
-    updatePreview();
+// tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');state.mode=btn.dataset.tab;
+    document.getElementById('tab-'+state.mode).classList.add('active');updatePreview();
   };
 });
 
-urlInput.addEventListener('input', () => {
-  state.url = urlInput.value.trim();
-  urlError.style.display = 'none';
-  updatePreview();
-});
-
-nameInput.addEventListener('input', () => {
-  state.name = nameInput.value || 'My App';
-  updatePreview();
-});
-
-document.getElementById('upload-area').onclick = () => document.getElementById('file-input').click();
-document.getElementById('file-input').onchange = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    state.imageDataUrl = ev.target.result;
-    const preview = document.getElementById('img-preview');
-    preview.src = state.imageDataUrl;
-    preview.style.display = 'block';
-    updatePreview();
-  };
-  reader.readAsDataURL(file);
+document.getElementById('url-input').addEventListener('input',function(){state.url=this.value.trim();document.getElementById('url-error').style.display='none';updatePreview();});
+document.getElementById('name-input').addEventListener('input',function(){state.name=this.value||'My App';updatePreview();});
+document.getElementById('monogram-input').addEventListener('input',function(){state.monogram=this.value;updatePreview();});
+document.getElementById('upload-area').onclick=()=>document.getElementById('file-input').click();
+document.getElementById('file-input').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{state.imageDataUrl=ev.target.result;const p=document.getElementById('img-preview');p.src=state.imageDataUrl;p.style.display='block';updatePreview();};
+  r.readAsDataURL(f);
 };
 
-document.getElementById('monogram-input').addEventListener('input', function() {
-  state.monogram = this.value;
-  updatePreview();
-});
-
-function isValidUrl(str) {
-  try { const u = new URL(str); return u.protocol === 'https:' || u.protocol === 'http:'; }
-  catch { return false; }
+function iconHTML(s,size){
+  const sz=size==='sm'?'24px':'60px';
+  if(s.mode==='emoji')return`<span style="font-size:${sz};line-height:1;">${s.emoji}</span>`;
+  if(s.mode==='upload'&&s.imageDataUrl)return`<img src="${s.imageDataUrl}" style="width:100%;height:100%;object-fit:cover;"/>`;
+  if(s.mode==='text'&&s.monogram){const m=s.monogram.toUpperCase();const f=size==='sm'?(m.length>1?'13px':'17px'):(m.length>1?'30px':'40px');return`<div style="width:100%;height:100%;background:${s.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${f};font-family:monospace;font-weight:600;">${m}</div>`;}
+  return`<span style="font-size:${sz};line-height:1;">🌐</span>`;
 }
 
-document.getElementById('gen-btn').onclick = () => {
-  const url = urlInput.value.trim();
-  if (!url || !isValidUrl(url)) {
-    urlError.style.display = 'block';
-    urlInput.focus();
-    return;
-  }
-  urlError.style.display = 'none';
-
-  const name = state.name || 'My App';
-  let iconHTML = '';
-
-  if (state.mode === 'emoji') {
-    iconHTML = `<div style="font-size:72px;line-height:1;">${state.emoji}</div>`;
-  } else if (state.mode === 'upload' && state.imageDataUrl) {
-    iconHTML = `<img src="${state.imageDataUrl}" style="width:96px;height:96px;border-radius:20px;object-fit:cover;" />`;
-  } else if (state.mode === 'text' && state.monogram) {
-    const mono = state.monogram.toUpperCase();
-    iconHTML = `<div style="width:96px;height:96px;border-radius:20px;background:${state.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${mono.length>1?'38':'48'}px;font-family:monospace;font-weight:600;">${mono}</div>`;
-  } else {
-    iconHTML = `<div style="font-size:72px;line-height:1;">🌐</div>`;
-  }
-
-  const faviconSvg = (() => {
-    if (state.mode === 'emoji') {
-      return `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>${encodeURIComponent(state.emoji)}</text></svg>`;
-    } else if (state.mode === 'text' && state.monogram) {
-      const m = encodeURIComponent(state.monogram.toUpperCase());
-      return `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='${encodeURIComponent(state.color)}'/><text x='16' y='23' font-size='16' font-weight='bold' fill='white' text-anchor='middle' font-family='monospace'>${m}</text></svg>`;
-    } else if (state.mode === 'upload' && state.imageDataUrl) {
-      return state.imageDataUrl;
-    }
-    return `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌐</text></svg>`;
-  })();
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${name}</title>
-<link rel="icon" href="${faviconSvg}" />
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-#setup{background:#f8f9fa;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;}
-#loading{display:none;position:fixed;inset:0;background:#fff;z-index:9999;}
-.app-icon{width:80px;height:80px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:1.25rem;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
-.app-name{font-size:22px;font-weight:600;color:#202124;margin-bottom:0.4rem;}
-.app-url{font-size:13px;color:#5f6368;margin-bottom:2.5rem;}
-.steps-box{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);padding:1.75rem 2rem;max-width:480px;width:100%;margin-bottom:1.5rem;}
-.steps-heading{font-size:13px;font-weight:600;color:#5f6368;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.25rem;}
-.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:1.1rem;}
-.step:last-child{margin-bottom:0;}
-.step-badge{min-width:28px;height:28px;border-radius:50%;background:#1a73e8;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px;}
-.step-body{flex:1;}
-.step-title{font-size:14px;font-weight:600;color:#202124;margin-bottom:2px;}
-.step-desc{font-size:13px;color:#5f6368;line-height:1.55;}
-.menu-mock{display:inline-flex;align-items:center;gap:5px;background:#f1f3f4;border:1px solid #dadce0;border-radius:6px;padding:3px 10px 3px 7px;font-size:12px;color:#3c4043;margin-top:6px;}
-.menu-dots{font-size:16px;font-weight:700;letter-spacing:-1px;color:#5f6368;}
-.arrow{color:#9aa0a6;font-size:11px;}
-.highlight{background:#e8f0fe;color:#1a73e8;border-radius:4px;padding:1px 6px;font-weight:600;font-size:12px;}
-.divider{height:1px;background:#f1f3f4;margin:1.1rem 0;}
-.already-btn{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.5rem;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
-.already-btn:hover{background:#1557b0;}
-.already-note{font-size:12px;color:#9aa0a6;margin-top:0.6rem;text-align:center;}
-</style>
-</head>
-<body>
-
-<div id="setup">
-  <div class="app-icon" id="app-icon-el">${iconHTML}</div>
-  <p class="app-name">${name}</p>
-  <p class="app-url">${url}</p>
-
-  <div class="steps-box">
-    <p class="steps-heading">Add to shelf — 3 steps</p>
-
-    <div class="step">
-      <div class="step-badge">1</div>
-      <div class="step-body">
-        <p class="step-title">Click the three-dot menu</p>
-        <p class="step-desc">In Chrome, click the <strong>⋮</strong> button in the top-right corner of the browser.</p>
-        <div class="menu-mock"><span class="menu-dots">⋮</span> <span class="arrow">▸</span> Menu</div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="step">
-      <div class="step-badge">2</div>
-      <div class="step-body">
-        <p class="step-title">Go to More tools</p>
-        <p class="step-desc">Hover over <span class="highlight">More tools</span> in the dropdown, then click <span class="highlight">Add to shelf</span> (or "Create shortcut").</p>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="step">
-      <div class="step-badge">3</div>
-      <div class="step-body">
-        <p class="step-title">Confirm &amp; pin</p>
-        <p class="step-desc">A dialog appears with the name <strong>${name}</strong>. Click <span class="highlight">Add</span>. Your icon now appears on the shelf — clicking it opens <strong>${url}</strong>.</p>
-      </div>
-    </div>
-  </div>
-
-  <button class="already-btn" onclick="goNow()">Already added it — open now →</button>
-  <p class="already-note">Or just click the icon on your shelf</p>
-</div>
-
-<div id="loading"></div>
-
-<script>
-function goNow(){
-  document.getElementById('setup').style.display='none';
-  document.getElementById('loading').style.display='flex';
-  setTimeout(function(){ window.location.href="${url}"; }, 900);
+function updatePreview(){
+  const ip=document.getElementById('icon-preview');
+  ip.style.background=(s=>s.mode==='upload'&&s.imageDataUrl||s.mode==='text'&&s.monogram?'transparent':'#1e1e2e')(state);
+  ip.innerHTML=iconHTML(state,'sm');
+  document.getElementById('preview-name').textContent=state.name||'My App';
+  document.getElementById('preview-url').textContent=state.url||'https://example.com';
 }
-(function(){
-  var p=new URLSearchParams(window.location.search);
-  if(p.get('launch')==='1') goNow();
-})();
-<\/script>
-</body>
-</html>`;
 
-  const blob = new Blob([html], {type: 'text/html'});
-  const blobUrl = URL.createObjectURL(blob);
-  window.open(blobUrl, '_blank');
+function isValidUrl(s){try{const u=new URL(s);return u.protocol==='https:'||u.protocol==='http:';}catch{return false;}}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Generate the shortcut page HTML, then base64 encode it into a data URI
+function generateDataURI(sc){
+  const favicon=getFavicon(sc);
+  const bigIcon=getBigIcon(sc);
+
+  const pageHTML=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${esc(sc.name)}</title><link rel="icon" href="${favicon}"><style>*{margin:0;padding:0;box-sizing:border-box;}html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}#s{background:#f8f9fa;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;}#l{display:none;position:fixed;inset:0;background:#fff;z-index:9999;}.ai{width:80px;height:80px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15);}.an{font-size:22px;font-weight:600;color:#202124;margin-bottom:.4rem;}.au{font-size:13px;color:#5f6368;margin-bottom:2.5rem;max-width:400px;text-align:center;word-break:break-all;}.bx{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);padding:1.75rem 2rem;max-width:480px;width:100%;margin-bottom:1.5rem;}.bt{font-size:13px;font-weight:600;color:#5f6368;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.25rem;}.st{display:flex;gap:14px;align-items:flex-start;margin-bottom:1.1rem;}.st:last-child{margin-bottom:0;}.nb{min-width:28px;height:28px;border-radius:50%;background:#1a73e8;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px;}.sb{flex:1;}.sh{font-size:14px;font-weight:600;color:#202124;margin-bottom:2px;}.sd{font-size:13px;color:#5f6368;line-height:1.55;}.hl{background:#e8f0fe;color:#1a73e8;border-radius:4px;padding:1px 6px;font-weight:600;font-size:12px;}.dv{height:1px;background:#f1f3f4;margin:1.1rem 0;}.db{background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:.6rem 1.5rem;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}.db:hover{background:#1557b0;}.nt{font-size:12px;color:#aaa;margin-top:.6rem;}</style></head><body><div id="s"><div class="ai">${bigIcon}</div><p class="an">${esc(sc.name)}</p><p class="au">${esc(sc.url)}</p><div class="bx"><p class="bt">Add to shelf — 3 steps</p><div class="st"><div class="nb">1</div><div class="sb"><p class="sh">Click the three-dot menu</p><p class="sd">Click <strong>⋮</strong> in the top-right corner of Chrome.</p></div></div><div class="dv"></div><div class="st"><div class="nb">2</div><div class="sb"><p class="sh">More tools → Add to shelf</p><p class="sd">Hover <span class="hl">More tools</span> then click <span class="hl">Add to shelf</span>.</p></div></div><div class="dv"></div><div class="st"><div class="nb">3</div><div class="sb"><p class="sh">Confirm</p><p class="sd">Click <span class="hl">Add</span>. Your icon appears on the shelf!</p></div></div></div><button class="db" onclick="goNow()">Already added — open now →</button><p class="nt">Or just click the icon on your shelf</p></div><div id="l"></div><script>function goNow(){document.getElementById('s').style.display='none';document.getElementById('l').style.display='block';setTimeout(function(){window.location.href=${JSON.stringify(sc.url)};},600);}<\/script></body></html>`;
+
+  const b64=btoa(unescape(encodeURIComponent(pageHTML)));
+  return 'data:text/html;base64,'+b64;
+}
+
+function getFavicon(sc){
+  if(sc.mode==='emoji')return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>${encodeURIComponent(sc.emoji)}</text></svg>`;
+  if(sc.mode==='text'&&sc.monogram){const m=encodeURIComponent(sc.monogram.toUpperCase());const c=encodeURIComponent(sc.color);return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='${c}'/><text x='16' y='23' font-size='16' font-weight='bold' fill='white' text-anchor='middle' font-family='monospace'>${m}</text></svg>`;}
+  if(sc.mode==='upload'&&sc.imageDataUrl)return sc.imageDataUrl;
+  return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌐</text></svg>`;
+}
+
+function getBigIcon(sc){
+  if(sc.mode==='emoji')return`<span style="font-size:52px;line-height:1;">${sc.emoji}</span>`;
+  if(sc.mode==='upload'&&sc.imageDataUrl)return`<img src="${sc.imageDataUrl}" style="width:80px;height:80px;object-fit:cover;"/>`;
+  if(sc.mode==='text'&&sc.monogram){const m=sc.monogram.toUpperCase();return`<div style="width:80px;height:80px;background:${sc.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${m.length>1?'32':'42'}px;font-family:monospace;font-weight:600;">${m}</div>`;}
+  return`<span style="font-size:52px;line-height:1;">🌐</span>`;
+}
+
+document.getElementById('add-btn').onclick=()=>{
+  if(!state.url||!isValidUrl(state.url)){document.getElementById('url-error').style.display='block';document.getElementById('url-input').focus();return;}
+  const sc={id:Date.now(),url:state.url,name:state.name||'My App',mode:state.mode,emoji:state.emoji,imageDataUrl:state.imageDataUrl,monogram:state.monogram,color:state.color};
+  sc.dataURI=generateDataURI(sc);
+  shortcuts.push(sc);
+  renderList();
+  document.getElementById('url-input').value='';document.getElementById('name-input').value='';
+  state.url='';state.name='My App';updatePreview();
 };
 
-buildEmojiGrid();
-buildColorRow();
+function renderList(){
+  const list=document.getElementById('sc-list');
+  document.getElementById('sc-count').textContent=shortcuts.length;
+  if(!shortcuts.length){list.innerHTML='<p class="list-empty">No shortcuts yet — build one above.</p>';return;}
+  list.innerHTML='';
+  shortcuts.forEach(sc=>{
+    const wrap=document.createElement('div');wrap.className='shortcut-item';
+
+    // top row
+    const top=document.createElement('div');top.className='sc-top';
+    const ico=document.createElement('div');ico.className='sc-icon';
+    ico.style.background=(sc.mode==='upload'&&sc.imageDataUrl)||(sc.mode==='text'&&sc.monogram)?'transparent':'#1e1e2e';
+    ico.innerHTML=iconHTML(sc,'sm');
+    const info=document.createElement('div');info.className='sc-info';
+    info.innerHTML=`<p class="sc-name">${esc(sc.name)}</p><p class="sc-url">${esc(sc.url)}</p>`;
+    const del=document.createElement('button');del.className='del-btn';del.textContent='✕';
+    del.onclick=()=>{shortcuts=shortcuts.filter(s=>s.id!==sc.id);renderList();};
+    top.appendChild(ico);top.appendChild(info);top.appendChild(del);
+
+    // steps + copy
+    const steps=document.createElement('div');steps.className='sc-steps';
+    steps.innerHTML=`<p class="sc-steps-title">How to add this to your shelf</p>
+<div class="sc-step"><span class="sc-step-num">1.</span><span>Click <strong style="color:#f0f0f0">Open link</strong> below. It opens a new tab.</span></div>
+<div class="sc-step"><span class="sc-step-num">2.</span><span>In that tab, click <strong style="color:#f0f0f0">⋮ menu</strong> → <strong style="color:#f0f0f0">More tools</strong> → <strong style="color:#f0f0f0">Add to shelf</strong>.</span></div>
+<div class="sc-step"><span class="sc-step-num">3.</span><span>Click <strong style="color:#f0f0f0">Add</strong>. Done — your icon is on the shelf!</span></div>`;
+
+    const row=document.createElement('div');row.className='copy-row';
+    const inp=document.createElement('input');inp.type='text';inp.className='copy-input';inp.value=sc.dataURI;inp.readOnly=true;
+
+    const openBtn=document.createElement('button');openBtn.className='open-btn';openBtn.textContent='Open link';
+    openBtn.onclick=()=>window.open(sc.dataURI,'_blank');
+
+    const copyBtn=document.createElement('button');copyBtn.className='copy-btn';copyBtn.textContent='Copy link';
+    copyBtn.onclick=()=>{
+      navigator.clipboard.writeText(sc.dataURI).then(()=>{
+        copyBtn.textContent='Copied!';copyBtn.classList.add('copied');
+        setTimeout(()=>{copyBtn.textContent='Copy link';copyBtn.classList.remove('copied');},2000);
+      }).catch(()=>{inp.select();document.execCommand('copy');});
+    };
+
+    row.appendChild(openBtn);row.appendChild(copyBtn);
+    steps.appendChild(row);
+    wrap.appendChild(top);wrap.appendChild(steps);
+    list.appendChild(wrap);
+  });
+}
+
 updatePreview();
 </script>
 </body>
