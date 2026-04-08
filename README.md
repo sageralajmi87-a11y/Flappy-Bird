@@ -1,5 +1,5 @@
-# Custom App Icon Maker For ChromeOS
+# NOVA
 
-A website that adds an app with the image you have provided with the desired link basicly a custom app icon maker.
+A galaxy start page
 
-Visit: https://sageralajmi87-a11y.github.io/ChromeOS-Custom-App-Icon-Maker
+Visit: https://sageralajmi87-a11y.github.io/Nova-Startpage
