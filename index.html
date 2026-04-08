@@ -1,447 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChromeOS Shortcut Maker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#0f0f11;--surface:#18181c;--surface2:#22222a;--surface3:#2c2c38;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16);
-  --accent:#c8f069;--accent-dim:rgba(200,240,105,0.1);--accent-dim2:rgba(200,240,105,0.2);
-  --text:#f0f0f0;--text2:#9a9aab;--text3:#55556a;--red:#ff6b6b;--green:#4ade80;
-  --mono:'DM Mono',monospace;--serif:'Fraunces',Georgia,serif;
-}
-body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem 6rem;}
-header{text-align:center;margin-bottom:2.5rem;}
-.eyebrow{font-size:11px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:0.75rem;}
-h1{font-family:var(--serif);font-weight:300;font-size:clamp(1.9rem,5vw,3rem);line-height:1.15;}
-h1 em{font-style:italic;color:var(--accent);}
-.subtitle{margin-top:0.75rem;font-size:13px;color:var(--text2);line-height:1.65;max-width:500px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova | Pro Interface</title>
+    <style>
+        :root {
+            --bg-base: #020005;
+            --bg-glow: #15052e;
+            --accent-main: #d8b4fe;
+            --accent-hover: #e9d5ff;
+            --link-title: #a78bfa;
+            --link-url: #818cf8;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --transition-smooth: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-/* username bar */
-.username-bar{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:10px;}
-.username-label{font-size:12px;color:var(--text2);flex-shrink:0;}
-.username-prefix{font-size:13px;color:var(--text3);flex-shrink:0;}
-.username-input{flex:1;background:transparent;border:none;color:var(--accent);font-family:var(--mono);font-size:13px;outline:none;min-width:0;}
-.username-input::placeholder{color:var(--text3);}
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-base);
+            background-image: radial-gradient(circle at 50% -20%, var(--bg-glow), transparent 60%);
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden; /* Hide main scroll, handle in results */
+        }
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:560px;}
-.field{margin-bottom:1.5rem;}
-label{display:block;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem;}
-.input-with-hint{position:relative;}
-input[type="text"],input[type="url"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;padding:0.7rem 1rem;outline:none;transition:border-color 0.2s;}
-input[type="text"]:focus,input[type="url"]:focus{border-color:var(--accent);}
-input::placeholder{color:var(--text3);}
-.slug-hint{font-size:11px;color:var(--text3);margin-top:0.35rem;}
-.slug-hint span{color:var(--accent);}
+        /* The Master Layout */
+        .master-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 0 20px;
+            transition: var(--transition-smooth);
+            transform: translateY(0);
+        }
 
-.icon-tabs{display:flex;gap:6px;margin-bottom:1rem;}
-.tab-btn{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--mono);font-size:12px;padding:0.45rem 0;cursor:pointer;transition:all 0.15s;}
-.tab-btn.active{background:var(--accent-dim2);border-color:var(--accent);color:var(--accent);}
-.tab-btn:hover:not(.active){border-color:var(--border2);color:var(--text);}
-.tab-panel{display:none;}.tab-panel.active{display:block;}
-.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-height:200px;overflow-y:auto;padding-right:4px;}
-.emoji-grid::-webkit-scrollbar{width:4px;}.emoji-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-.emoji-btn{aspect-ratio:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;line-height:1;}
-.emoji-btn:hover{border-color:var(--border2);transform:scale(1.08);}
-.emoji-btn.selected{border-color:var(--accent);background:var(--accent-dim2);}
-.upload-area{border:1px dashed var(--border2);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;}
-.upload-area:hover{border-color:var(--accent);background:var(--accent-dim);}
-.upload-area input{display:none;}
-.upload-icon{font-size:24px;margin-bottom:0.4rem;}
-.upload-label{font-size:12px;color:var(--text2);}
-.upload-hint{font-size:11px;color:var(--text3);margin-top:3px;}
-#img-preview{max-width:52px;max-height:52px;border-radius:8px;margin:0.5rem auto 0;display:none;}
-.color-row{display:flex;gap:8px;flex-wrap:wrap;}
-.color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
-.color-swatch:hover{transform:scale(1.15);}
-.color-swatch.selected{border-color:white;}
+        /* The 'Searching' State */
+        .searching-state {
+            justify-content: flex-start;
+            padding-top: 5vh;
+        }
 
-.divider{height:1px;background:var(--border);margin:1.5rem 0;}
-.preview-block{display:flex;align-items:center;gap:1rem;background:var(--surface2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;}
-.icon-box{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
-.preview-text{min-width:0;}
-.preview-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.preview-url{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-.preview-live{font-size:11px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;}
-.error-msg{font-size:12px;color:var(--red);margin-top:0.4rem;display:none;}
+        /* Typography & Header */
+        .header-group {
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
 
-.add-btn{width:100%;background:var(--accent);color:#0f0f11;border:none;border-radius:10px;font-family:var(--mono);font-size:14px;font-weight:500;padding:0.85rem;cursor:pointer;transition:opacity 0.15s,transform 0.1s;letter-spacing:0.04em;}
-.add-btn:hover{opacity:0.88;}
-.add-btn:active{transform:scale(0.98);}
+        .logo {
+            font-size: 6rem;
+            font-weight: 900;
+            letter-spacing: -4px;
+            margin: 0;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-main) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 20px rgba(216, 180, 254, 0.15));
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
 
-/* list */
-.list-section{width:100%;max-width:560px;margin-top:2rem;}
-.list-label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text2);margin-bottom:0.75rem;}
-.list-empty{font-size:13px;color:var(--text3);text-align:center;padding:2.5rem 0;}
+        .searching-state .logo { font-size: 2.5rem; letter-spacing: -1px; }
 
-.sc-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:0.75rem;overflow:hidden;}
-.sc-header{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;}
-.sc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:23px;}
-.sc-meta{flex:1;min-width:0;}
-.sc-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sc-dest{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
-.sc-live{font-size:11px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-.del-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:12px;padding:0.3rem 0.55rem;cursor:pointer;transition:all 0.15s;flex-shrink:0;}
-.del-btn:hover{border-color:var(--red);color:var(--red);}
+        .clock {
+            font-size: 1.1rem;
+            color: var(--accent-main);
+            letter-spacing: 6px;
+            margin-top: 5px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-weight: 300;
+            transition: var(--transition-smooth);
+            height: 20px; /* fixed height to prevent layout jumping */
+            overflow: hidden;
+        }
 
-.sc-body{border-top:1px solid var(--border);padding:1.25rem;}
-.step-row{display:flex;gap:10px;margin-bottom:0.75rem;font-size:13px;color:var(--text2);line-height:1.55;}
-.step-row:last-of-type{margin-bottom:1rem;}
-.step-n{color:var(--accent);font-weight:500;flex-shrink:0;}
-.step-row strong{color:var(--text);}
+        .searching-state .clock { opacity: 0; height: 0; margin: 0; }
 
-/* code block */
-.code-block{background:var(--bg);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
-.code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;border-bottom:1px solid var(--border);background:var(--surface2);}
-.code-filename{font-size:12px;color:var(--text2);}
-.code-filename strong{color:var(--text);}
-.copy-code-btn{background:var(--accent);color:#0f0f11;border:none;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:500;padding:0.3rem 0.75rem;cursor:pointer;transition:opacity 0.15s;}
-.copy-code-btn:hover{opacity:0.85;}
-.copy-code-btn.done{background:var(--green);color:#0f0f11;}
-.code-scroll{max-height:160px;overflow-y:auto;padding:0.85rem 1rem;font-size:11px;color:var(--text2);line-height:1.6;white-space:pre;overflow-x:auto;}
-.code-scroll::-webkit-scrollbar{width:4px;height:4px;}.code-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-</style>
+        /* Search Input */
+        .search-container {
+            width: 100%;
+            max-width: 650px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 20px 30px;
+            border-radius: 100px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            font-size: 1.2rem;
+            outline: none;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: var(--transition-smooth);
+        }
+
+        .search-bar:focus {
+            border-color: rgba(216, 180, 254, 0.5);
+            box-shadow: 0 0 30px rgba(216, 180, 254, 0.15), inset 0 0 10px rgba(216, 180, 254, 0.05);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* Results Area */
+        .results-container {
+            width: 100%;
+            max-width: 750px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 5px 15px;
+        }
+
+        /* Custom Scrollbar for Results */
+        .results-container::-webkit-scrollbar { width: 6px; }
+        .results-container::-webkit-scrollbar-thumb { background: rgba(216, 180, 254, 0.2); border-radius: 10px; }
+        .results-container::-webkit-scrollbar-thumb:hover { background: rgba(216, 180, 254, 0.5); }
+
+        .results-active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .result-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 22px 28px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .result-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(216, 180, 254, 0.3);
+            transform: scale(1.01);
+        }
+
+        .res-url { color: var(--link-url); font-size: 0.85rem; display: block; margin-bottom: 6px; }
+        .res-link { color: var(--link-title); font-size: 1.35rem; font-weight: 600; text-decoration: none; display: inline-block; margin-bottom: 8px; }
+        .res-link:hover { text-decoration: underline; color: var(--accent-hover); }
+        .res-desc { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; margin: 0; }
+
+        /* Loader */
+        .loader { color: var(--accent-main); font-style: italic; text-align: center; padding: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    </style>
 </head>
 <body>
 
-<header>
-  <p class="eyebrow">GitHub Pages · ChromeOS</p>
-  <h1>Shelf Shortcut <em>Maker</em></h1>
-  <p class="subtitle">Generates real hosted pages on your GitHub Pages site. Each shortcut becomes a folder — open its URL in Chrome, then add to shelf with a custom icon.</p>
-</header>
+    <div class="master-container" id="appRoot">
+        <div class="header-group">
+            <h1 class="logo" onclick="resetUI()">NOVA</h1>
+            <div class="clock" id="timeDisplay">00:00:00</div>
+        </div>
 
-<!-- github username -->
-<div class="username-bar">
-  <span class="username-label">Your GitHub username</span>
-  <span class="username-prefix">github.com/</span>
-  <input class="username-input" id="username-input" placeholder="yourusername" autocomplete="off" spellcheck="false"/>
-</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search the galaxy..." autocomplete="off">
+        </div>
 
-<!-- builder -->
-<div class="card">
-  <div class="field">
-    <label for="url-input">Destination URL</label>
-    <input type="url" id="url-input" placeholder="https://youtube.com" autocomplete="off"/>
-    <p class="error-msg" id="url-error">Please enter a valid URL (https://...)</p>
-  </div>
-  <div class="field">
-    <label for="name-input">App name</label>
-    <input type="text" id="name-input" placeholder="YouTube" maxlength="40"/>
-  </div>
-  <div class="field">
-    <label for="slug-input">Folder name <span style="color:var(--text3);font-size:10px;text-transform:none;letter-spacing:0;">(no spaces)</span></label>
-    <input type="text" id="slug-input" placeholder="youtube" maxlength="40" spellcheck="false"/>
-    <p class="slug-hint" id="slug-hint">Live at: <span id="slug-preview">https://yourusername.github.io/youtube/</span></p>
-  </div>
-  <div class="field">
-    <label>Icon</label>
-    <div class="icon-tabs">
-      <button class="tab-btn active" data-tab="emoji">Emoji</button>
-      <button class="tab-btn" data-tab="upload">Image</button>
-      <button class="tab-btn" data-tab="text">Monogram</button>
+        <div class="results-container" id="searchResults"></div>
     </div>
-    <div class="tab-panel active" id="tab-emoji">
-      <div class="emoji-grid" id="emoji-grid"></div>
-    </div>
-    <div class="tab-panel" id="tab-upload">
-      <div class="upload-area" id="upload-area">
-        <input type="file" id="file-input" accept="image/*"/>
-        <div class="upload-icon">⬆</div>
-        <p class="upload-label">Click to upload an image</p>
-        <p class="upload-hint">PNG, JPG, SVG, WebP</p>
-        <img id="img-preview" alt="preview"/>
-      </div>
-    </div>
-    <div class="tab-panel" id="tab-text">
-      <input type="text" id="monogram-input" placeholder="e.g. YT or G" maxlength="2" style="margin-bottom:0.75rem;"/>
-      <div class="color-row" id="color-row"></div>
-    </div>
-  </div>
-  <div class="divider"></div>
-  <p style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:.75rem;">Preview</p>
-  <div class="preview-block">
-    <div class="icon-box" id="icon-preview" style="background:#1e1e2e;">🌐</div>
-    <div class="preview-text">
-      <p class="preview-name" id="preview-name">YouTube</p>
-      <p class="preview-url" id="preview-url">https://youtube.com</p>
-      <p class="preview-live" id="preview-live">https://yourusername.github.io/youtube/</p>
-    </div>
-  </div>
-  <button class="add-btn" id="add-btn">+ Generate shortcut</button>
-</div>
 
-<!-- list -->
-<div class="list-section">
-  <p class="list-label">Generated shortcuts (<span id="sc-count">0</span>)</p>
-  <div id="sc-list"><p class="list-empty">No shortcuts yet — fill in the form above.</p></div>
-</div>
+    <!-- UI Sounds -->
+    <audio id="sndSearch" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+    <audio id="sndReset" src="https://www.soundjay.com/buttons/sounds/button-17.mp3" preload="auto"></audio>
 
-<script>
-const EMOJIS=['🌐','🔗','📁','📂','💼','🏠','⭐','🔖','📧','📅','📝','🎵','🎬','📷','🎮','🛒','💬','🔍','⚙️','🔧','📊','📈','💡','🎨','✏️','📚','🏆','🔔','💻','📱','🖥️','🖨️','🗂️','📌','🔐','🛡️','🌙','☀️','🌈','❄️','🔥','⚡','💎','🚀','✈️','🏖️','🌿','🦁','🐉','🦊','🐼','🦋','🌸','🍕','☕','🎂','🎁','🎯','🧩','🎲','🃏','🎭','🎪','🏅'];
-const COLORS=['#4285f4','#ea4335','#34a853','#fbbc05','#ff6d00','#9c27b0','#00bcd4','#607d8b','#e91e63','#795548','#1a1a2e','#0d7377'];
+    <script>
+        // 1. Live Time
+        function updateTime() {
+            document.getElementById('timeDisplay').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        }
+        setInterval(updateTime, 1000); updateTime();
 
-let state={url:'',name:'',slug:'',mode:'emoji',emoji:'🌐',imageDataUrl:null,monogram:'',color:'#4285f4'};
-let username='';
-let shortcuts=[];
+        // 2. Core Search Logic
+        async function executeSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const root = document.getElementById('appRoot');
+            const results = document.getElementById('searchResults');
 
-// emoji
-const egrid=document.getElementById('emoji-grid');
-EMOJIS.forEach(em=>{
-  const b=document.createElement('button');b.className='emoji-btn'+(em===state.emoji?' selected':'');b.textContent=em;
-  b.onclick=()=>{egrid.querySelectorAll('.emoji-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.emoji=em;updatePreview();};
-  egrid.appendChild(b);
-});
+            // PRO FEATURE: If empty and Enter is pressed -> Reset to Middle
+            if (!query) {
+                resetUI();
+                return;
+            }
 
-// colors
-const crow=document.getElementById('color-row');
-COLORS.forEach(c=>{
-  const s=document.createElement('div');s.className='color-swatch'+(c===state.color?' selected':'');s.style.background=c;
-  s.onclick=()=>{crow.querySelectorAll('.color-swatch').forEach(x=>x.classList.remove('selected'));s.classList.add('selected');state.color=c;updatePreview();};
-  crow.appendChild(s);
-});
+            // Key check
+            let apiKey = localStorage.getItem('nova_pro_key');
+            if (!apiKey) {
+                apiKey = prompt("Nova Pro Authorization Required.\nEnter Groq API Key:");
+                if (apiKey) localStorage.setItem('nova_pro_key', apiKey);
+                else return;
+            }
 
-// tabs
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');state.mode=btn.dataset.tab;
-    document.getElementById('tab-'+state.mode).classList.add('active');updatePreview();
-  };
-});
+            // Trigger Search State Animations
+            root.classList.add('searching-state');
+            document.getElementById('sndSearch').play().catch(()=>{});
+            
+            // Show loader
+            results.innerHTML = "<div class='result-card'><div class='loader'>Establishing quantum connection...</div></div>";
+            results.classList.add('results-active');
 
-function toSlug(s){return s.toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');}
-function getLiveUrl(slug){const u=username||'yourusername';return`https://${u}.github.io/${slug||'shortcut'}/`;}
+            // API Call
+            try {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            {
+                                role: "system", 
+                                content: "You are a search engine. Return exactly 5 highly accurate search results for the user's query. Use this EXACT HTML structure for each result, and nothing else: <div class='result-card'><span class='res-url'>FULL_URL_HERE</span><br><a href='FULL_URL_HERE' target='_blank' class='res-link'>TITLE_HERE</a><p class='res-desc'>DESCRIPTION_HERE</p></div>. Do not include markdown blocks like ```html. Output raw HTML only."
+                            },
+                            {role: "user", content: query}
+                        ],
+                        temperature: 0.1
+                    })
+                });
 
-document.getElementById('username-input').addEventListener('input',function(){username=this.value.trim().replace(/[^a-zA-Z0-9-]/g,'');updatePreview();renderList();});
-document.getElementById('url-input').addEventListener('input',function(){state.url=this.value.trim();document.getElementById('url-error').style.display='none';updatePreview();});
-document.getElementById('name-input').addEventListener('input',function(){
-  state.name=this.value;
-  if(!state._slugManual) {state.slug=toSlug(this.value); document.getElementById('slug-input').value=state.slug;}
-  updatePreview();
-});
-document.getElementById('slug-input').addEventListener('input',function(){
-  state.slug=toSlug(this.value)||this.value.toLowerCase();
-  state._slugManual=true;
-  updatePreview();
-});
-document.getElementById('slug-input').addEventListener('blur',function(){
-  this.value=toSlug(this.value)||state.slug;
-  state.slug=this.value;
-});
-document.getElementById('monogram-input').addEventListener('input',function(){state.monogram=this.value;updatePreview();});
-document.getElementById('upload-area').onclick=()=>document.getElementById('file-input').click();
-document.getElementById('file-input').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{state.imageDataUrl=ev.target.result;document.getElementById('img-preview').src=state.imageDataUrl;document.getElementById('img-preview').style.display='block';updatePreview();};
-  r.readAsDataURL(f);
-};
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                
+                // Remove markdown codeblock artifacts if the AI sneaks them in
+                let rawHTML = data.choices[0].message.content;
+                rawHTML = rawHTML.replace(/```html/gi, '').replace(/```/g, '');
+                
+                results.innerHTML = rawHTML;
 
-function iconHTML(s,small){
-  const sz=small?'23px':'48px';
-  if(s.mode==='emoji')return`<span style="font-size:${sz};line-height:1;">${s.emoji}</span>`;
-  if(s.mode==='upload'&&s.imageDataUrl)return`<img src="${s.imageDataUrl}" style="width:100%;height:100%;object-fit:cover;"/>`;
-  if(s.mode==='text'&&s.monogram){const m=s.monogram.toUpperCase();const f=small?(m.length>1?'13px':'16px'):(m.length>1?'24px':'32px');return`<div style="width:100%;height:100%;background:${s.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${f};font-family:monospace;font-weight:600;">${m}</div>`;}
-  return`<span style="font-size:${sz};line-height:1;">🌐</span>`;
-}
-function hasBg(s){return!((s.mode==='upload'&&s.imageDataUrl)||(s.mode==='text'&&s.monogram));}
+            } catch (err) {
+                results.innerHTML = `<div class='result-card' style='border-color: #ef4444;'><span class='res-link' style='color:#ef4444'>Connection Error</span><p class='res-desc'>${err.message}</p></div>`;
+                if(err.message.includes("API key") || err.message.includes("key")) localStorage.removeItem('nova_pro_key');
+            }
+        }
 
-function updatePreview(){
-  const ip=document.getElementById('icon-preview');
-  ip.style.background=hasBg(state)?'#1e1e2e':'transparent';
-  ip.innerHTML=iconHTML(state,true);
-  document.getElementById('preview-name').textContent=state.name||'My App';
-  document.getElementById('preview-url').textContent=state.url||'https://example.com';
-  const slug=state.slug||toSlug(state.name)||'shortcut';
-  const live=getLiveUrl(slug);
-  document.getElementById('preview-live').textContent=live;
-  document.getElementById('slug-preview').textContent=live;
-}
+        // 3. Reset UI Function
+        function resetUI() {
+            const root = document.getElementById('appRoot');
+            const results = document.getElementById('searchResults');
+            const input = document.getElementById('searchInput');
+            
+            // Play reset sound
+            document.getElementById('sndReset').play().catch(()=>{});
+            
+            // Clear text
+            input.value = "";
+            
+            // Fade out results
+            results.classList.remove('results-active');
+            
+            // Animate layout back to center
+            root.classList.remove('searching-state');
+            
+            // Wait for fade out, then clear DOM
+            setTimeout(() => {
+                if(!root.classList.contains('searching-state')) {
+                    results.innerHTML = "";
+                }
+            }, 500);
+        }
 
-function isValidUrl(s){try{const u=new URL(s);return u.protocol==='https:'||u.protocol==='http:';}catch{return false;}}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-// Generate the favicon as SVG data URI
-function getFavicon(sc){
-  if(sc.mode==='emoji'){
-    return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${encodeURIComponent(sc.emoji)}</text></svg>`;
-  }
-  if(sc.mode==='text'&&sc.monogram){
-    const m=encodeURIComponent(sc.monogram.toUpperCase());
-    const c=encodeURIComponent(sc.color);
-    return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='${c}'/><text x='50' y='72' font-size='52' font-weight='bold' fill='white' text-anchor='middle' font-family='monospace'>${m}</text></svg>`;
-  }
-  if(sc.mode==='upload'&&sc.imageDataUrl) return sc.imageDataUrl;
-  return`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>`;
-}
-
-// Generate the index.html content for GitHub Pages
-function generateIndexHTML(sc){
-  const favicon=getFavicon(sc);
-  const destUrl=sc.url;
-  const safeName=esc(sc.name);
-  const storageKey='shelf_added_'+btoa(encodeURIComponent(sc.url)).replace(/=/g,'');
-
-  const p=[];
-  p.push('<!DOCTYPE html><html lang="en"><head>');
-  p.push('<meta charset="UTF-8">');
-  p.push('<meta name="viewport" content="width=device-width,initial-scale=1.0">');
-  p.push('<title>'+safeName+'</title>');
-  p.push('<link rel="icon" type="image/svg+xml" href="'+favicon+'">');
-  p.push('<style>');
-  p.push('*{margin:0;padding:0;box-sizing:border-box;}');
-  p.push('html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}');
-  p.push('body{background:#f8f9fa;}');
-  p.push('#setup{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;gap:1rem;}');
-  p.push('#loading{display:none;position:fixed;inset:0;background:#fff;z-index:9999;}');
-  p.push('.card{background:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08),0 8px 32px rgba(0,0,0,0.08);padding:2rem;max-width:400px;width:100%;}');
-  p.push('.label{font-size:11px;font-weight:600;color:#5f6368;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;}');
-  p.push('.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:1rem;}');
-  p.push('.step:last-child{margin-bottom:0;}');
-  p.push('.num{min-width:28px;height:28px;border-radius:50%;background:#1a73e8;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px;}');
-  p.push('.txt{font-size:14px;color:#3c4043;line-height:1.6;padding-top:3px;}');
-  p.push('.txt strong{color:#202124;}');
-  p.push('.tag{display:inline-block;background:#e8f0fe;color:#1a73e8;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:600;}');
-  p.push('.hr{height:1px;background:#f1f3f4;margin:0.85rem 0;}');
-  p.push('.done-card{background:#1a73e8;border-radius:20px;padding:1.75rem 2rem;max-width:400px;width:100%;text-align:center;}');
-  p.push('.done-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:0.3rem;}');
-  p.push('.done-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:1.25rem;line-height:1.5;}');
-  p.push('.go-btn{width:100%;background:#fff;color:#1a73e8;border:none;border-radius:10px;font-size:15px;font-weight:700;padding:0.8rem;cursor:pointer;font-family:inherit;}');
-  p.push('.go-btn:hover{opacity:0.92;}');
-  p.push('.skip{font-size:12px;color:rgba(255,255,255,0.55);margin-top:0.65rem;}');
-  p.push('.skip a{color:rgba(255,255,255,0.8);}');
-  p.push('</style></head><body>');
-  p.push('<div id="setup">');
-  p.push('<div class="card" id="steps-card">');
-  p.push('<p class="label">Add to shelf first</p>');
-  p.push('<div class="step"><div class="num">1</div><p class="txt">Click the <strong>three-dot menu ⋮</strong> in the top-right corner of Chrome.</p></div>');
-  p.push('<div class="hr"></div>');
-  p.push('<div class="step"><div class="num">2</div><p class="txt">Hover <span class="tag">More tools</span> then click <span class="tag">Add to shelf</span>.</p></div>');
-  p.push('<div class="hr"></div>');
-  p.push('<div class="step"><div class="num">3</div><p class="txt">Click <span class="tag">Add</span> in the dialog. <strong>'+safeName+'</strong> is now on your shelf!</p></div>');
-  p.push('</div>');
-  p.push('<div class="done-card">');
-  p.push('<p class="done-title">Done adding it to shelf?</p>');
-  p.push('<p class="done-sub">Click below to open '+safeName+'. This setup screen won\'t show again.</p>');
-  p.push('<button class="go-btn" onclick="finish()">Open '+safeName+' \u2192</button>');
-  p.push('<p class="skip">Skip setup? <a href="'+esc(destUrl)+'">Go directly</a></p>');
-  p.push('</div>');
-  p.push('</div>');
-  p.push('<div id="loading"></div>');
-  p.push('<script>');
-  p.push('var KEY='+JSON.stringify(storageKey)+';');
-  p.push('var DEST='+JSON.stringify(destUrl)+';');
-  p.push('(function(){');
-  p.push('  try{');
-  p.push('    if(localStorage.getItem(KEY)==="1"){');
-  p.push('      document.getElementById("setup").style.display="none";');
-  p.push('      document.getElementById("loading").style.display="block";');
-  p.push('      window.location.replace(DEST);');
-  p.push('      return;');
-  p.push('    }');
-  p.push('  }catch(e){}');
-  p.push('})();');
-  p.push('function finish(){');
-  p.push('  try{localStorage.setItem(KEY,"1");}catch(e){}');
-  p.push('  document.getElementById("setup").style.display="none";');
-  p.push('  document.getElementById("loading").style.display="block";');
-  p.push('  setTimeout(function(){window.location.replace(DEST);},400);');
-  p.push('}');
-  p.push('<\/script>');
-  p.push('</body></html>');
-  return p.join('\n');
-}
-
-document.getElementById('add-btn').onclick=()=>{
-  if(!state.url||!isValidUrl(state.url)){document.getElementById('url-error').style.display='block';document.getElementById('url-input').focus();return;}
-  if(!username){document.getElementById('username-input').focus();document.getElementById('username-input').style.borderBottom='1px solid var(--accent)';return;}
-  const slug=state.slug||toSlug(state.name)||'shortcut';
-  const sc={
-    id:Date.now(),url:state.url,name:state.name||'My App',
-    slug,liveUrl:getLiveUrl(slug),
-    mode:state.mode,emoji:state.emoji,imageDataUrl:state.imageDataUrl,
-    monogram:state.monogram,color:state.color,
-    code:generateIndexHTML({url:state.url,name:state.name||'My App',mode:state.mode,emoji:state.emoji,imageDataUrl:state.imageDataUrl,monogram:state.monogram,color:state.color})
-  };
-  shortcuts.push(sc);
-  renderList();
-  // reset
-  document.getElementById('url-input').value='';
-  document.getElementById('name-input').value='';
-  document.getElementById('slug-input').value='';
-  state.url='';state.name='';state.slug='';state._slugManual=false;
-  updatePreview();
-};
-
-function renderList(){
-  const list=document.getElementById('sc-list');
-  document.getElementById('sc-count').textContent=shortcuts.length;
-  if(!shortcuts.length){list.innerHTML='<p class="list-empty">No shortcuts yet — fill in the form above.</p>';return;}
-  list.innerHTML='';
-  shortcuts.forEach(sc=>{
-    const wrap=document.createElement('div');wrap.className='sc-item';
-
-    // header
-    const header=document.createElement('div');header.className='sc-header';
-    const ico=document.createElement('div');ico.className='sc-icon';
-    ico.style.background=hasBg(sc)?'#1e1e2e':'transparent';
-    ico.innerHTML=iconHTML(sc,true);
-    const meta=document.createElement('div');meta.className='sc-meta';
-    meta.innerHTML=`<p class="sc-name">${esc(sc.name)}</p><p class="sc-dest">${esc(sc.url)}</p><p class="sc-live">${esc(sc.liveUrl)}</p>`;
-    const del=document.createElement('button');del.className='del-btn';del.textContent='✕';
-    del.onclick=()=>{shortcuts=shortcuts.filter(s=>s.id!==sc.id);renderList();};
-    header.appendChild(ico);header.appendChild(meta);header.appendChild(del);
-
-    // body
-    const body=document.createElement('div');body.className='sc-body';
-
-    // steps
-    const steps=`
-      <div class="step-row"><span class="step-n">1.</span><span>In your GitHub repo, click <strong>Add file → Create new file</strong>.</span></div>
-      <div class="step-row"><span class="step-n">2.</span><span>Name it <strong>${esc(sc.slug)}/index.html</strong> — type the slash to create the folder.</span></div>
-      <div class="step-row"><span class="step-n">3.</span><span>Paste the code below, click <strong>Commit changes</strong>.</span></div>
-      <div class="step-row"><span class="step-n">4.</span><span>Wait ~30 seconds, then open <strong style="color:var(--accent)">${esc(sc.liveUrl)}</strong> in Chrome on your Chromebook.</span></div>
-      <div class="step-row"><span class="step-n">5.</span><span>Click <strong>⋮ → More tools → Add to shelf</strong>. Your custom icon appears!</span></div>`;
-    body.innerHTML=steps;
-
-    // code block
-    const codeBlock=document.createElement('div');codeBlock.className='code-block';
-    const codeHeader=document.createElement('div');codeHeader.className='code-header';
-    codeHeader.innerHTML=`<span class="code-filename"><strong>${esc(sc.slug)}/index.html</strong></span>`;
-    const copyBtn=document.createElement('button');copyBtn.className='copy-code-btn';copyBtn.textContent='Copy code';
-    copyBtn.onclick=()=>{
-      navigator.clipboard.writeText(sc.code).then(()=>{
-        copyBtn.textContent='Copied ✓';copyBtn.classList.add('done');
-        setTimeout(()=>{copyBtn.textContent='Copy code';copyBtn.classList.remove('done');},2500);
-      });
-    };
-    codeHeader.appendChild(copyBtn);
-    const codePre=document.createElement('div');codePre.className='code-scroll';
-    codePre.textContent=sc.code;
-    codeBlock.appendChild(codeHeader);codeBlock.appendChild(codePre);
-    body.appendChild(codeBlock);
-
-    // open live btn (shown after user would have committed)
-    const openRow=document.createElement('div');openRow.style.cssText='margin-top:0.75rem;display:flex;gap:8px;';
-    const openBtn=document.createElement('button');
-    openBtn.style.cssText='flex:1;padding:0.55rem;background:var(--accent);color:#0f0f11;border:none;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:500;cursor:pointer;';
-    openBtn.textContent='Open live page →';
-    openBtn.onclick=()=>window.open(sc.liveUrl,'_blank');
-    openRow.appendChild(openBtn);
-    body.appendChild(openRow);
-
-    wrap.appendChild(header);wrap.appendChild(body);
-    list.appendChild(wrap);
-  });
-}
-
-updatePreview();
-</script>
+        // 4. Event Listeners
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') executeSearch();
+        });
+        
+        // Clear input with Escape key
+        document.getElementById('searchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') resetUI();
+        });
+    </script>
 </body>
 </html>
